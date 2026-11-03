@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>計時器</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    padding: 32px 24px 24px;
+    text-align: center;
+  }
+
+  h1 {
+    margin: 0 0 22px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: #718096;
+  }
+
+  #display {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: clamp(32px, 10vw, 44px);
+    letter-spacing: 1px;
+    color: #2d3748;
+    margin-bottom: 26px;
+    user-select: none;
+  }
+
+  .btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  button {
+    flex: 1;
+    padding: 12px 0;
+    font-family: inherit;
+    font-size: 15px;
+    color: #fff;
+    background: #667eea;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background .15s ease, transform .05s ease;
+  }
+
+  button:hover { background: #5a6fd6; }
+  button:active { transform: scale(.97); }
+
+  button.secondary {
+    background: #edf2f7;
+    color: #4a5568;
+  }
+  button.secondary:hover { background: #e2e8f0; }
+
+  button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  #laps {
+    display: none;
+    list-style: none;
+    margin: 20px 0 0;
+    padding: 0;
+    max-height: 160px;
+    overflow-y: auto;
+    text-align: left;
+  }
+
+  #laps li {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 4px;
+    font-size: 14px;
+    color: #4a5568;
+    font-variant-numeric: tabular-nums;
+    border-bottom: 1px solid #edf2f7;
+  }
+  #laps li:last-child { border-bottom: none; }
+
+  .hint {
+    margin: 18px 0 0;
+    font-size: 12px;
+    color: #a0aec0;
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>計時器</h1>
+
+    <div id="display">00:00:00.00</div>
+
+    <div class="btns">
+      <button id="startBtn">開始</button>
+      <button id="lapBtn" class="secondary" disabled>計次</button>
+      <button id="resetBtn" class="secondary">重設</button>
+    </div>
+
+    <ul id="laps"></ul>
+
+    <p class="hint">空白鍵：開始／暫停　·　L：計次　·　R：重設</p>
+  </div>
+
+<script>
+(function () {
+  'use strict';
+
+  var displayEl = document.getElementById('display');
+  var startBtn  = document.getElementById('startBtn');
+  var lapBtn    = document.getElementById('lapBtn');
+  var resetBtn  = document.getElementById('resetBtn');
+  var lapsEl    = document.getElementById('laps');
+
+  var running    = false;   // 是否正在計時
+  var startStamp = 0;       // 這次開始時的時間戳
+  var accumulated = 0;      // 之前累積的毫秒數
+  var rafId      = null;
+  var lapCount   = 0;
+
+  // 目前總毫秒數
+  function currentMs() {
+    return accumulated + (running ? performance.now() - startStamp : 0);
+  }
+
+  // 00:00:00.00（時:分:秒.百分秒）
+  function format(ms) {
+    if (ms < 0) ms = 0;
+    ms = Math.floor(ms);
+    var cs = Math.floor(ms / 10) % 100;
+    var s  = Math.floor(ms / 1000) % 60;
+    var m  = Math.floor(ms / 60000) % 60;
+    var h  = Math.floor(ms / 3600000);
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    return pad(h) + ':' + pad(m) + ':' + pad(s) + '.' + pad(cs);
+  }
+
+  function render() {
+    displayEl.textContent = format(currentMs());
+  }
+
+  function tick() {
+    render();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function start() {
+    if (running) return;
+    running = true;
+    startStamp = performance.now();
+    startBtn.textContent = '暫停';
+    lapBtn.disabled = false;
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function pause() {
+    if (!running) return;
+    accumulated += performance.now() - startStamp;
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+    startBtn.textContent = '開始';
+    render();
+  }
+
+  function toggle() {
+    running ? pause() : start();
+  }
+
+  function reset() {
+    running = false;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = null;
+
+    accumulated = 0;
+    startStamp = 0;
+    lapCount = 0;
+
+    startBtn.textContent = '開始';
+    lapBtn.disabled = true;
+    lapsEl.innerHTML = '';
+    lapsEl.style.display = 'none';
+    render();
+  }
+
+  function addLap() {
+    if (!running && accumulated === 0) return;
+
+    lapCount++;
+    var li = document.createElement('li');
+
+    var name = document.createElement('span');
+    name.textContent = '第 ' + lapCount + ' 次';
+
+    var time = document.createElement('span');
+    time.textContent = format(currentMs());
+
+    li.appendChild(name);
+    li.appendChild(time);
+    lapsEl.insertBefore(li, lapsEl.firstChild); // 最新在上
+    lapsEl.style.display = 'block';
+  }
+
+  // ---- 事件綁定 ----
+  startBtn.addEventListener('click', toggle);
+  resetBtn.addEventListener('click', reset);
+  lapBtn.addEventListener('click', addLap);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.repeat) return;
+
+    if (e.code === 'Space' || e.key === ' ') {
+      e.preventDefault();
+      toggle();
+    } else if (e.key === 'r' || e.key === 'R') {
+      reset();
+    } else if (e.key === 'l' || e.key === 'L') {
+      addLap();
+    }
+  });
+
+  // 初始畫面
+  render();
+})();
+</script>
+
+</body>
+</html>
