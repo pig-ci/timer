@@ -1,0 +1,24 @@
+<svg width="280" height="110" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <linearGradient y2="1" x2="1" y1="0" x1="0" id="g7">
+   <stop stop-color="#ff8a00" offset="0"/>
+   <stop stop-color="#ff2d78" offset="1"/>
+  </linearGradient>
+ </defs>
+ <g>
+  <title>Layer 1</title>
+  <text font-style="italic" id="svg_11" letter-spacing="-1" opacity="0.8" fill="#ff2d78" font-weight="bold" font-size="52" font-family="'Cabin',Arial,sans-serif" y="75" x="113">Timer</text>
+  <text style="cursor: move;" font-style="italic" id="svg_12" letter-spacing="-1" fill="url(#g7)" font-weight="bold" font-size="52" font-family="'Cabin',Arial,sans-serif" y="72" x="110">Timer</text>
+  <circle id="svg_1" opacity="0.3" stroke-width="2.5" stroke="url(#g7)" fill="none" r="33" cy="55" cx="62"/>
+  <circle id="svg_2" stroke-width="3.5" stroke="url(#g7)" fill="#fff" r="33" cy="55" cx="48"/>
+  <g id="svg_3" stroke-linecap="round" stroke-width="2" stroke="url(#g7)">
+   <line id="svg_4" y2="30" x2="48" y1="26" x1="48"/>
+   <line id="svg_5" y2="84" x2="48" y1="80" x1="48"/>
+   <line id="svg_6" y2="55" x2="23" y1="55" x1="19"/>
+   <line id="svg_7" y2="55" x2="77" y1="55" x1="73"/>
+  </g>
+  <line id="svg_8" stroke-linecap="round" stroke-width="4" stroke="url(#g7)" y2="44" x2="31" y1="55" x1="48"/>
+  <line id="svg_9" stroke-linecap="round" stroke-width="4" stroke="url(#g7)" y2="31" x2="48" y1="55" x1="48"/>
+  <circle id="svg_10" fill="url(#g7)" r="3.5" cy="55" cx="48"/>
+ </g>
+</svg>
