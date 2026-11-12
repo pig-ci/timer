@@ -1,0 +1,17 @@
+{
+    "name": "計時器",
+    "short_name": "計時器",
+    "start_url": ".",
+    "scope": ".",
+    "display": "standalone",
+    "background_color": "#667eea",
+    "theme_color": "#667eea",
+    "icons": [
+        {
+          "src": "favicon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml",
+          "purpose": "any"
+        }
+    ]
+}
